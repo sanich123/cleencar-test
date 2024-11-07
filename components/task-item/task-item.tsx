@@ -1,8 +1,9 @@
 import { memo } from 'react';
 import { StyleSheet } from 'react-native';
-import { Text, IconButton } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 import { ThemedView } from '../ThemedView';
+import CloseBtn from '../close-btn/close-btn';
 
 import { TaskProps } from '@/constants/types';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
@@ -12,20 +13,13 @@ export default memo(
   function Task({ name, description, date }: TaskProps) {
     const dispatch = useAppDispatch();
     const { tasks } = useAppSelector(({ tasks }) => tasks);
+    const onPressFn = () => dispatch(saveTasks(tasks.filter(({ date: taskDate }) => taskDate !== date)));
 
     return (
       <ThemedView style={styles.taskLayout}>
         <Text variant="titleLarge">{name}</Text>
         <Text variant="bodyMedium">{description}</Text>
-        <IconButton
-          icon="close"
-          size={30}
-          style={styles.closeBtn}
-          onPress={() => {
-            const updatedTasks = tasks.filter(({ date: taskDate }) => taskDate !== date);
-            dispatch(saveTasks(updatedTasks));
-          }}
-        />
+        <CloseBtn size={30} onPressFn={onPressFn} />
       </ThemedView>
     );
   },
