@@ -46,6 +46,7 @@ export default function Controls() {
       <ThemedView style={styles.inputsLayout}>
         {inputValues.map(({ onSubmitEditing, onChangeText, label, returnKey, value, ref }) => (
           <TextInput
+            key={label}
             onSubmitEditing={onSubmitEditing}
             onChangeText={onChangeText}
             mode="outlined"
