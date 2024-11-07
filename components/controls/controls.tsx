@@ -1,20 +1,25 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { StyleSheet, TextInput as Input } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
 import { ThemedView } from '../ThemedView';
 
-import { ControlsProps } from '@/constants/types';
+import { useAppDispatch, useAppSelector } from '@/redux/store';
+import { saveDescription, saveName, saveTasks } from '@/redux/tasks/tasks';
 
-export default function Controls({ setTasks, tasks }: ControlsProps) {
-  const [name, setName] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+export default function Controls() {
+  const dispatch = useAppDispatch();
+  const { currentName, currentDescription, tasks } = useAppSelector(({ tasks }) => tasks);
   const descriptionRef = useRef<Input>(null);
 
   function submitHandler() {
-    setTasks([...tasks, { name, description, date: new Date().toString() }]);
-    setName('');
-    setDescription('');
+    const updatedTasks = [
+      ...tasks,
+      { name: currentName, description: currentDescription, date: new Date().toString() },
+    ];
+    dispatch(saveTasks(updatedTasks));
+    dispatch(saveName(''));
+    dispatch(saveDescription(''));
   }
 
   return (
@@ -22,31 +27,30 @@ export default function Controls({ setTasks, tasks }: ControlsProps) {
       <ThemedView style={styles.inputsLayout}>
         <TextInput
           onSubmitEditing={() => descriptionRef?.current?.focus()}
-          onChangeText={(text) => setName(text)}
+          onChangeText={(text) => dispatch(saveName(text))}
           mode="outlined"
           label="Ваше имя"
           inputMode="text"
           returnKeyLabel="next"
           returnKeyType="next"
-          value={name}
+          value={currentName}
         />
         <TextInput
           ref={descriptionRef}
-          onChangeText={(text) => setDescription(text)}
-          onSubmitEditing={() => name && submitHandler()}
+          onChangeText={(text) => dispatch(saveDescription(text))}
+          onSubmitEditing={() => currentName && submitHandler()}
           mode="outlined"
           label="Описание"
           inputMode="text"
           returnKeyLabel="send"
           returnKeyType="send"
-          value={description}
+          value={currentDescription}
         />
       </ThemedView>
-
       <Button
         style={{ marginVertical: 10 }}
         mode="outlined"
-        disabled={!name || !description}
+        disabled={!currentName || !currentDescription}
         onPress={() => submitHandler()}>
         Добавить
       </Button>
