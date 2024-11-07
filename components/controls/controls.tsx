@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { StyleSheet, TextInput as Input } from 'react-native';
+import { StyleSheet, TextInput as Input, ReturnKeyType } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 
 import { ThemedView } from '../ThemedView';
@@ -22,30 +22,41 @@ export default function Controls() {
     dispatch(saveDescription(''));
   }
 
+  const inputValues = [
+    {
+      onSubmitEditing: () => descriptionRef?.current?.focus(),
+      onChangeText: (text: string) => dispatch(saveName(text)),
+      label: 'Ваше имя',
+      returnKey: 'next',
+      value: currentName,
+      ref: undefined,
+    },
+    {
+      onSubmitEditing: () => currentName && submitHandler(),
+      onChangeText: (text: string) => dispatch(saveDescription(text)),
+      label: 'Описание',
+      returnKey: 'send',
+      value: currentDescription,
+      ref: descriptionRef,
+    },
+  ];
+
   return (
     <ThemedView style={styles.controlsLayout}>
       <ThemedView style={styles.inputsLayout}>
-        <TextInput
-          onSubmitEditing={() => descriptionRef?.current?.focus()}
-          onChangeText={(text) => dispatch(saveName(text))}
-          mode="outlined"
-          label="Ваше имя"
-          inputMode="text"
-          returnKeyLabel="next"
-          returnKeyType="next"
-          value={currentName}
-        />
-        <TextInput
-          ref={descriptionRef}
-          onChangeText={(text) => dispatch(saveDescription(text))}
-          onSubmitEditing={() => currentName && submitHandler()}
-          mode="outlined"
-          label="Описание"
-          inputMode="text"
-          returnKeyLabel="send"
-          returnKeyType="send"
-          value={currentDescription}
-        />
+        {inputValues.map(({ onSubmitEditing, onChangeText, label, returnKey, value, ref }) => (
+          <TextInput
+            onSubmitEditing={onSubmitEditing}
+            onChangeText={onChangeText}
+            mode="outlined"
+            label={label}
+            inputMode="text"
+            returnKeyLabel={returnKey}
+            returnKeyType={returnKey as ReturnKeyType}
+            ref={ref}
+            value={value}
+          />
+        ))}
       </ThemedView>
       <Button
         style={{ marginVertical: 10 }}
